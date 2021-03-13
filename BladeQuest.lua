@@ -225,7 +225,7 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
                                             
                                             wait(0.75)
                                         elseif v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health == 0 and v1.Name ~= "Dummy" then
-                                            wait(2.5)
+                                            wait(5)
                                             if v1 ~= nil and v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health == 0 then
                                                 game:GetService("TeleportService"):Teleport(6494523288, game.Players.LocalPlayer)
                                             end 
