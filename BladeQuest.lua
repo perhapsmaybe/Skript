@@ -1,4 +1,7 @@
-_G.UIStyle = 3
+repeat 
+    wait()
+until game:IsLoaded()
+
 if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 2429242760 then 
     if syn then
         if isfolder("Blade Quest") then
@@ -176,7 +179,6 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
     function LocalPlayer() return Loaded() and game:GetService("Players").LocalPlayer end 
     function PlayerAlive() if not Loaded() or not LocalPlayer() then return false end if CheckObject(game:GetService("Players").LocalPlayer.Character) and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Humanoid") and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Humanoid").Health > 0 then return true end return false end
     
-    shared.InstaKillTP = false
     shared.KillingEnemies = false
     Player.Toggle({
         Text = "Insta-Kill",
@@ -206,7 +208,7 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
                                     end 
                                     
                                     if v1 and v1:FindFirstChild("HumanoidRootPart") then
-                                        if PlayerAlive() and v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health > 0 then
+                                        if PlayerAlive() and v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health > 0 and v.Name ~= "Dummy" then
                                             for i, v in pairs(game:GetService("Players").LocalPlayer.Character:GetChildren()) do
                                                 if v.Name == "HumanoidRootPart" then
                                                     v.Anchored = false 
@@ -221,6 +223,11 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
                                             v1:FindFirstChild("Enemy").Health = 0
                                             
                                             wait(0.75)
+                                        elseif v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health == 0 and v.Name ~= "Dummy" then
+                                            wait(2.5)
+                                            if v1 ~= nil and v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health == 0 then
+                                                game:GetService("TeleportService"):Teleport(6494523288, game.Players.LocalPlayer)
+                                            end 
                                         end 
                                     end 
                                 end 
