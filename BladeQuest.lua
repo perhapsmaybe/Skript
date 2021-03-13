@@ -90,6 +90,7 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
                             local Friends = shared.DungeonFriends or true 
                             local Hardcore = shared.DungeonHardcore or false
                                 
+                            game:GetService("ReplicatedStorage").RF:InvokeServer("Start")
                             game:GetService("ReplicatedStorage").RF:InvokeServer("Create", Map, Difficulty, Friends, Hardcore)
                             game:GetService("ReplicatedStorage").RF:InvokeServer("Start")
                         end 
