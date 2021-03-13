@@ -3,7 +3,7 @@ repeat
 until game:IsLoaded()
 
 if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 2429242760 then 
-    if syn then
+    if isfolder and isfile and writefile and readfile and makefolder then
         if isfolder("Blade Quest") then
             if isfile("Blade Quest/Settings.txt") then
                 local Settings = game:GetService("HttpService"):JSONDecode(readfile("Blade Quest/Settings.txt"))
@@ -85,11 +85,15 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
                     repeat
                         wait(5)
                         if shared.CreateDungeon and game.PlaceId == 6494523288 then
-                            local Map = tostring(shared.DungeonMap) or "Forest"
-                            local Difficulty = tostring(shared.DungeonDifficulty) or "Easy"
+                            local Map = shared.DungeonMap or "Forest"
+                            local Difficulty = shared.DungeonDifficulty or "Easy"
                             local Friends = shared.DungeonFriends or true 
                             local Hardcore = shared.DungeonHardcore or false
                                 
+                            print(Map)
+                            print(Difficulty)
+                            print(Friends)
+                            print(Hardcore)
                             game:GetService("ReplicatedStorage").RF:InvokeServer("Start")
                             game:GetService("ReplicatedStorage").RF:InvokeServer("Create", Map, Difficulty, Friends, Hardcore)
                             game:GetService("ReplicatedStorage").RF:InvokeServer("Start")
