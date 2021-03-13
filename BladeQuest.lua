@@ -62,7 +62,7 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
     end 
 
     local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
-    local UI = Material.Load({Title="Blade Quest", Style=_G.UIStyle, SizeX=400, SizeY=300, Theme="Light"})
+    local UI = Material.Load({Title="Blade Quest", Style=_G.UIStyle or 3, SizeX=400, SizeY=300, Theme="Light"})
     
     local Player = UI.New({
         Title = "Player"
@@ -208,7 +208,7 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
                                     end 
                                     
                                     if v1 and v1:FindFirstChild("HumanoidRootPart") then
-                                        if PlayerAlive() and v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health > 0 and v.Name ~= "Dummy" then
+                                        if v1~= nil and PlayerAlive() and v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health > 0 and v1.Name ~= "Dummy" then
                                             for i, v in pairs(game:GetService("Players").LocalPlayer.Character:GetChildren()) do
                                                 if v.Name == "HumanoidRootPart" then
                                                     v.Anchored = false 
@@ -223,7 +223,7 @@ if game.PlaceId == 6494529140 or game.PlaceId == 6494523288 or game.gameId == 24
                                             v1:FindFirstChild("Enemy").Health = 0
                                             
                                             wait(0.75)
-                                        elseif v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health == 0 and v.Name ~= "Dummy" then
+                                        elseif v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health == 0 and v1.Name ~= "Dummy" then
                                             wait(2.5)
                                             if v1 ~= nil and v1:FindFirstChild("Enemy") and v1:FindFirstChild("Enemy").Health == 0 then
                                                 game:GetService("TeleportService"):Teleport(6494523288, game.Players.LocalPlayer)
