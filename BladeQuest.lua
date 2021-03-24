@@ -69,6 +69,7 @@ local AutoAttack = Player.Toggle({Text="Auto-Attack",
         shared.BladeQuest["Player"]["AutoAttack"] = Value
         
         local a = getsenv(game.Players.LocalPlayer.Character.Sword.Sword)
+        a.fireRate = 0.1
         setsimulationradius(1e3, 1e3)
         spawn(
             function()
