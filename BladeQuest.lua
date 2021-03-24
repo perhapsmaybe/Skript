@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ConvertedFunctions = ConvertFunctions()
 
-shared.BladeQuest = {["Player"] = {["AutoAttack"] = false,["AutoDodge"] = false,["AutoSupport"] = false,["AutoDamage"] = false},["Dungeon"] = {["CreateDungeon"] = false,["Map"] = "Forest",["Difficulty"] = "Easy",["Hardcore"] = false,["FriendsOnly"] = true},["Pathfinding"] = {["Pathfinding"] = true,["ShowPath"] = false,["AroundObstacles"] = false},["AutoBuy"] = {["AutoBuy"] = true,["MaxBuyCost"] = 5000,["BuyBestSword"] = true,["BuyTime"] = 1},["AutoSell"] = {["AutoSell"] = false,["SellTime"] = 1,["MinSellValue"] = 10,["MaxSellValue"] = 10,["MinLevel"] = 1,["MaxLevel"] = 1}}
+shared.BladeQuest = {["Player"] = {["AutoAttack"] = false,["AutoDodge"] = false,["AutoSupport"] = false,["AutoDamage"] = false, ["attackWalkSpeed"] = 20, ["defaultWalkSpeed"] = 20},["Dungeon"] = {["CreateDungeon"] = false,["Map"] = "Forest",["Difficulty"] = "Easy",["Hardcore"] = false,["FriendsOnly"] = true},["Pathfinding"] = {["Pathfinding"] = true,["ShowPath"] = false,["AroundObstacles"] = false},["AutoBuy"] = {["AutoBuy"] = true,["MaxBuyCost"] = 5000,["BuyBestSword"] = true,["BuyTime"] = 1},["AutoSell"] = {["AutoSell"] = false,["SellTime"] = 1,["MinSellValue"] = 10,["MaxSellValue"] = 10,["MinLevel"] = 1,["MaxLevel"] = 1}}
 
 local Lobby, Dungeon = CheckGame()
 
@@ -187,6 +187,38 @@ Player:Toggle("Auto-Dodge", "Automatically dodges if the next attack from an ene
     end 
 end)
 
+Player:Line()
+
+local function ConvertNumberToBaseValue(Max, Min, BaseValue)
+    local ReturnValue = 0
+    for i = 0, Max do
+        local TempValue = i and math.floor((i / Max) * (Max - Min) + Min) or 0
+        
+        if TempValue == BaseValue then
+            ReturnValue = i
+        end 
+    end 
+    
+    return ReturnValue
+end
+
+
+ChangeSwordVariable("attackWalkSpeed", shared.BladeQuest["Player"]["attackWalkSpeed"])
+Player:Slider("Attack Walkspeed", "Walkspeed when attacking", 10, 50, ConvertNumberToBaseValue(50, 10, shared.BladeQuest["Player"]["attackWalkSpeed"]), function(Value)
+    shared.BladeQuest["Player"]["attackWalkSpeed"] = Value
+    ChangeSwordVariable("attackWalkSpeed", Value)
+
+    SaveSettings()
+end)
+
+ChangeSwordVariable("defaultWalkSpeed", shared.BladeQuest["Player"]["defaultWalkSpeed"])
+Player:Slider("Default Walkspeed", "Walkspeed when not attacking, updates after you stop attacking", 20, 100, ConvertNumberToBaseValue(100, 20, shared.BladeQuest["Player"]["defaultWalkSpeed"]), function(Value)
+    shared.BladeQuest["Player"]["defaultWalkSpeed"] = Value
+    ChangeSwordVariable("defaultWalkSpeed", Value)
+
+    SaveSettings()
+end)
+
 -- // Dungeon 
 
 local TempDifficulties = {"Easy", "Medium", "Hard", "Expert"}
@@ -205,7 +237,7 @@ local PathfindingToggle = Pathfinding:Toggle("Pathfinding", "Automatically moves
     
     if Value and not Lobby then 
         CreateLoop("Pathfinding", "Pathfinding", function()
-            wait()
+            
         end)
     end 
 end)
