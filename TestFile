@@ -1,5 +1,5 @@
 local paste = "https://raw.githubusercontent.com/perhapsmaybe/Skript/Code/TestFile"
-local message = "ayo, bro you good?"
+local message = _G.SpamMessage or "ayo, bro you good?"
 if not game:IsLoaded() then game.Loaded:wait() end
 
 local rand = Random.new()
