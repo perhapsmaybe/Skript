@@ -68,7 +68,7 @@ pcall(function()
 	end
 end)
 
-for _ = 1,messagetimes do
+for _ = 1,2 do
     event:FireServer(message, "All")
 end
 
