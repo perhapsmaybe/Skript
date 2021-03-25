@@ -206,8 +206,8 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
                 NewPart.Size = Vector3.new(1,1,1)
                 NewPart.Anchored = true 
                 
-                NewPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,2,0)
-                TempPlayer.Character.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+                NewPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,1,0)
+                TempPlayer.Character.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,2,0)
             end
         end)
         
@@ -218,8 +218,8 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
                     repeat 
                         wait()
                         if game:GetService("ReplicatedStorage").Enemies:FindFirstChild(v.Name) and game:GetService("ReplicatedStorage").Enemies[v.Name]:FindFirstChild("Boss") and game:GetService("ReplicatedStorage").Enemies[v.Name].Boss.Value then
-                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 5
-                            v.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame + Vector3.new(0,-3,0)
+                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 3
+                            v.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame + Vector3.new(0,-2,0)
                         else
                             v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 5
                         end 
