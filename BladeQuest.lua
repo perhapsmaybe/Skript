@@ -198,6 +198,17 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
                     end 
                 end 
             end 
+            
+            if BossTeleported == false and BossName ~= "None" and workspace.Enemies:FindFirstChild(BossName) then
+                BossTeleported = true
+                local NewPart = Instance.new("Part")
+                NewPart.Parent = TempPlayer.Character
+                NewPart.Size = Vector3.new(1,1,1)
+                NewPart.Anchored = true 
+                
+                NewPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,2,0)
+                TempPlayer.Character.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+            end
         end)
         
         CreateLoop("Player", "MobTP", function()
@@ -206,7 +217,12 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
                 if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and v:FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
                     repeat 
                         wait()
-                        v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 5
+                        if game:GetService("ReplicatedStorage").Enemies:FindFirstChild(v.Name) and game:GetService("ReplicatedStorage").Enemies[v.Name]:FindFirstChild("Boss") and game:GetService("ReplicatedStorage").Enemies[v.Name].Boss.Value then
+                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 5
+                            v.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame + Vector3.new(0,-3,0)
+                        else
+                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 5
+                        end 
                     until not v:FindFirstChildWhichIsA("Humanoid") or v:FindFirstChildWhichIsA("Humanoid").Health == 0
                 end 
             end 
