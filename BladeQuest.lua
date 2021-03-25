@@ -8,7 +8,23 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ConvertedFunctions = ConvertFunctions()
 
-shared.BladeQuest = {["Player"] = {["AutoAttack"] = false,["AutoDodge"] = false,["AutoSupport"] = false,["AutoDamage"] = false, ["attackWalkSpeed"] = 20, ["defaultWalkSpeed"] = 20},["Dungeon"] = {["CreateDungeon"] = false,["Map"] = "Forest",["Difficulty"] = "Easy",["Hardcore"] = false,["FriendsOnly"] = true},["Pathfinding"] = {["Pathfinding"] = true,["ShowPath"] = false,["AroundObstacles"] = false},["AutoBuy"] = {["AutoBuy"] = true,["MaxBuyCost"] = 5000,["BuyBestSword"] = true,["BuyTime"] = 1},["AutoSell"] = {["AutoSell"] = false,["SellTime"] = 1,["MinSellValue"] = 10,["MaxSellValue"] = 10,["MinLevel"] = 1,["MaxLevel"] = 1}}
+shared.BladeQuest = {["Player"] = {["MobTP"] = false, ["AutoAttack"] = false,["AutoDodge"] = false,["AutoSupport"] = false,["AutoDamage"] = false, ["attackWalkSpeed"] = 20, ["defaultWalkSpeed"] = 20},["Dungeon"] = {["CreateDungeon"] = false,["Map"] = "Forest",["Difficulty"] = "Easy",["Hardcore"] = false,["FriendsOnly"] = true},["Pathfinding"] = {
+        ["Pathfinding"] = true,
+        ["ShowPath"] = false,
+    },
+    ["AutoBuy"] = {
+        ["AutoBuy"] = true,
+        ["MaxBuyCost"] = 5000,
+        ["BuyBestSword"] = true,
+    },
+    ["AutoSell"] = {
+        ["AutoSell"] = false,
+        ["MinSellValue"] = 10,
+        ["MaxSellValue"] = 10,
+        ["MinLevel"] = 1,
+        ["MaxLevel"] = 1
+    }
+}
 
 local Lobby, Dungeon = CheckGame()
 
@@ -116,35 +132,8 @@ Player:Toggle("Auto-Attack", "Automatically attacks enemies that are in range!",
     end
 end)
 
-Player:Toggle("Auto-Damage", "Automatically uses support magic", shared.BladeQuest["Player"]["AutoDamage"], function(Value)
-    shared.BladeQuest["Player"]["AutoDamage"] = Value
-    SaveSettings()
-
-    if Value and not Lobby then
-        CreateLoop("Player", "AutoAttack", function()
-            setsimulationradius(1e3, 1e3)
-            ChangeSwordVariable("fireRate", 0.01)
-        
-            if GetEnemiesNearby() ~= false and {} then
-                RunSwordFunction("Damage")
-                RunSwordFunction("ResetSpeed")
-            end 
-        end)
-    end
-end)
-
-Player:Toggle("Auto-Support", "Automatically uses support magic", shared.BladeQuest["Player"]["AutoSupport"], function(Value)
-    shared.BladeQuest["Player"]["AutoSupport"] = Value
-    SaveSettings()
-
-    if Value and not Lobby then
-        CreateLoop("Player", "AutoSupport", function()
-            if TempPlayer.Character:FindFirstChild("Humanoid") and TempPlayer.Character.Humanoid.Health ~= TempPlayer.Character.Humanoid.MaxHealth then
-                RunSwordFunction("Support")
-            end
-        end)
-    end 
-end)
+Player:Toggle("Auto-Damage", "Automatically uses support magic", shared.BladeQuest["Player"]["AutoDamage"], function(Value) shared.BladeQuest["Player"]["AutoDamage"] = Value SaveSettings() if Value and not Lobby then CreateLoop("Player", "AutoAttack", function() setsimulationradius(1e3, 1e3) ChangeSwordVariable("fireRate", 0.01) if GetEnemiesNearby() ~= false and {} then RunSwordFunction("Damage") RunSwordFunction("ResetSpeed") end end) end end)
+Player:Toggle("Auto-Support", "Automatically uses support magic", shared.BladeQuest["Player"]["AutoSupport"], function(Value) shared.BladeQuest["Player"]["AutoSupport"] = Value SaveSettings() if Value and not Lobby then CreateLoop("Player", "AutoSupport", function() if TempPlayer.Character:FindFirstChild("Humanoid") and TempPlayer.Character.Humanoid.Health ~= TempPlayer.Character.Humanoid.MaxHealth then RunSwordFunction("Support") end end) end end)
 
 Player:Line()
 Player:Toggle("Auto-Dodge", "Automatically dodges if the next attack from an enemy will kill you!", shared.BladeQuest["Player"]["AutoDodge"], function(Value)
@@ -173,12 +162,8 @@ Player:Toggle("Auto-Dodge", "Automatically dodges if the next attack from an ene
                             if workspace:FindFirstChild("DodgeAwayPart") then 
                                 workspace.DodgeAwayPart:Destroy()
                             end
-                        elseif TempPlayer.Character.Humanoid.Health > AttackDamage and shared["Dodging"] == true then
+
                             shared["Dodging"] = false
-                            
-                            if workspace:FindFirstChild("DodgeAwayPart") then 
-                                workspace.DodgeAwayPart:Destroy()
-                            end 
                         end 
                     end
                 end 
@@ -187,37 +172,58 @@ Player:Toggle("Auto-Dodge", "Automatically dodges if the next attack from an ene
     end 
 end)
 
+local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you", shared.BladeQuest["Player"]["MobTP"], function(Value)
+    shared.BladeQuest["Player"]["MobTP"] = Value 
+    SaveSettings()       
+
+    if Value and not Lobby then
+        local BossName = "None"
+        local BossTeleported = false
+        CreateLoop("Player", "MobTP", function()
+            wait(1)
+            if BossName == "None" then
+                for i, v in pairs(game:GetService("ReplicatedStorage").Enemies:GetChildren()) do
+                    if v:FindFirstChild("Boss") and v:FindFirstChild("Boss").Value then
+                        BossName = v.Name
+                    end 
+                end 
+            end 
+            
+            for i, v in pairs(workspace.Enemies:GetChildren()) do
+                if string.find(BossName, v.Name) then
+                    if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and v:FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
+                        v.HumanoidRootPart.Anchored = not v.HumanoidRootPart.Anchored
+                    end 
+                end 
+            end 
+        end)
+        
+        CreateLoop("Player", "MobTP", function()
+            setsimulationradius(1e3, 1e3)
+            for i, v in pairs(workspace.Enemies:GetChildren()) do
+                if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and v:FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
+                    repeat 
+                        wait()
+                        v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 5
+                    until not v:FindFirstChildWhichIsA("Humanoid") or v:FindFirstChildWhichIsA("Humanoid").Health == 0
+                end 
+            end 
+            
+        end)
+    end
+end)
+
 Player:Line()
 
-local function ConvertNumberToBaseValue(Max, Min, BaseValue)
-    local ReturnValue = 0
-    for i = 0, Max do
-        local TempValue = i and math.floor((i / Max) * (Max - Min) + Min) or 0
-        
-        if TempValue == BaseValue then
-            ReturnValue = i
-        end 
-    end 
-    
-    return ReturnValue
-end
-
+local function ConvertNumberToBaseValue(Max, Min, BaseValue)local ReturnValue = 0 for i = 0, Max do local TempValue = i and math.floor((i / Max) * (Max - Min) + Min) or 0 if TempValue == BaseValue then ReturnValue = i end end return ReturnValue end
 
 ChangeSwordVariable("attackWalkSpeed", shared.BladeQuest["Player"]["attackWalkSpeed"])
-Player:Slider("Attack Walkspeed", "Walkspeed when attacking", 10, 50, ConvertNumberToBaseValue(50, 10, shared.BladeQuest["Player"]["attackWalkSpeed"]), function(Value)
-    shared.BladeQuest["Player"]["attackWalkSpeed"] = Value
-    ChangeSwordVariable("attackWalkSpeed", Value)
-
-    SaveSettings()
-end)
+Player:Slider("Attack Walkspeed", "Walkspeed when attacking", 10, 50, ConvertNumberToBaseValue(50, 10, shared.BladeQuest["Player"]["attackWalkSpeed"]), function(Value) shared.BladeQuest["Player"]["attackWalkSpeed"] = Value ChangeSwordVariable("attackWalkSpeed", Value) SaveSettings() end)
 
 ChangeSwordVariable("defaultWalkSpeed", shared.BladeQuest["Player"]["defaultWalkSpeed"])
-Player:Slider("Default Walkspeed", "Walkspeed when not attacking, updates after you stop attacking", 20, 100, ConvertNumberToBaseValue(100, 20, shared.BladeQuest["Player"]["defaultWalkSpeed"]), function(Value)
-    shared.BladeQuest["Player"]["defaultWalkSpeed"] = Value
-    ChangeSwordVariable("defaultWalkSpeed", Value)
+Player:Slider("Default Walkspeed", "Walkspeed when not attacking, updates after you stop attacking", 20, 100, ConvertNumberToBaseValue(100, 20, shared.BladeQuest["Player"]["defaultWalkSpeed"]), function(Value) shared.BladeQuest["Player"]["defaultWalkSpeed"] = Value ChangeSwordVariable("defaultWalkSpeed", Value) SaveSettings() end)
 
-    SaveSettings()
-end)
+
 
 -- // Dungeon 
 
@@ -227,12 +233,12 @@ function GetMaps() local ReturnTable = {} if TempPlayer.PlayerGui:FindFirstChild
 local CreateDungeon = Dungeon:Toggle("Create Dungeon", "Automatically creates a dungeon when in lobby!", shared.BladeQuest["Dungeon"]["CreateDungeon"], function(Value) shared.BladeQuest["Dungeon"]["CreateDungeon"] = Value SaveSettings() if shared.BladeQuest["Dungeon"]["CreateDungeon"] and Lobby then CreateLoop("Dungeon", "CreateDungeon", function() wait(7.5) local TempDungeon = shared.BladeQuest["Dungeon"] local Map = TempDungeon["Map"] or "Forest" local Difficulty = TempDungeon["Difficulty"] or "Easy" local Friends = TempDungeon["FriendsOnly"] or true local Hardcore = TempDungeon["Hardcore"] or false game:GetService("ReplicatedStorage").RF:InvokeServer("Start") game:GetService("ReplicatedStorage").RF:InvokeServer("Create", Map, Difficulty, Friends, Hardcore) game:GetService("ReplicatedStorage").RF:InvokeServer("Start") end) end end)
 local FriendsOnly = Dungeon:Toggle("Friends Only", "Dungeons are friends only when automatically created!", shared.BladeQuest["Dungeon"]["FriendsOnly"], function(Value) shared.BladeQuest["Dungeon"]["FriendsOnly"] = Value SaveSettings() end)
 local HardcoreDungeon = Dungeon:Toggle("Hardcore Mode", "Dungeons are hardcore when automatically created! (One Life, More Loot)", shared.BladeQuest["Dungeon"]["Hardcore"], function(Value) shared.BladeQuest["Dungeon"]["Hardcore"] = Value SaveSettings() end)
-local MapsDropdown = Dungeon:Dropdown("Dungeon Map", GetMaps(), function(Value) shared.BladeQuest["Dungeon"]["Map"] = string.split(Value, [[(]])[1] end)
-local DifficultiesDropdown = Dungeon:Dropdown("Dungeon Difficulty", TempDifficulties, function(Value) shared.BladeQuest["Dungeon"]["Difficulty"] = Value if TempPlayer.PlayerGui:FindFirstChild("UI") and TempPlayer.PlayerGui.UI:FindFirstChild("Play") and TempPlayer.PlayerGui.UI.Play:FindFirstChild("Create") and TempPlayer.PlayerGui.UI.Play:FindFirstChild("Create") and TempPlayer.PlayerGui.UI.Play.Create:FindFirstChild("Maps") then if TempPlayer.PlayerGui.UI.Play.Create.Maps:FindFirstChild(shared.BladeQuest["Dungeon"]["Map"]) then local MapsPath = TempPlayer.PlayerGui.UI.Play.Create.Maps local CurrentMap = MapsPath[shared.BladeQuest["Dungeon"]["Map"]] local MapLevel = string.split(CurrentMap.Lvl.Text, "Level ")[2] MapLevel = MapLevel:gsub("+", "") MapLevel = tonumber(MapLevel) for i, v in pairs(TempDifficulties) do if v ~= Value then MapLevel = MapLevel + 3 end end if MapLevel >= TempPlayer.leaderstats.Level.Value then Flux:Notification("Warning! This difficulty level requires a level higher than your current level", "Alright, continue anyways") end end end end)
+local MapsDropdown = Dungeon:Dropdown("Dungeon Map", GetMaps(), function(Value) shared.BladeQuest["Dungeon"]["Map"] = string.split(Value, [[(]])[1] SaveSettings() end)
+local DifficultiesDropdown = Dungeon:Dropdown("Dungeon Difficulty", TempDifficulties, function(Value) shared.BladeQuest["Dungeon"]["Difficulty"] = Value SaveSettings() if TempPlayer.PlayerGui:FindFirstChild("UI") and TempPlayer.PlayerGui.UI:FindFirstChild("Play") and TempPlayer.PlayerGui.UI.Play:FindFirstChild("Create") and TempPlayer.PlayerGui.UI.Play:FindFirstChild("Create") and TempPlayer.PlayerGui.UI.Play.Create:FindFirstChild("Maps") then if TempPlayer.PlayerGui.UI.Play.Create.Maps:FindFirstChild(shared.BladeQuest["Dungeon"]["Map"]) then local MapsPath = TempPlayer.PlayerGui.UI.Play.Create.Maps local CurrentMap = MapsPath[shared.BladeQuest["Dungeon"]["Map"]] local MapLevel = string.split(CurrentMap.Lvl.Text, "Level ")[2] MapLevel = MapLevel:gsub("+", "") MapLevel = tonumber(MapLevel) for i, v in pairs(TempDifficulties) do if v ~= Value then MapLevel = MapLevel + 3 end end if MapLevel >= TempPlayer.leaderstats.Level.Value then Flux:Notification("Warning! This difficulty level requires a level higher than your current level", "Alright, continue anyways") end end end end)
 
 -- Pathfinding
 
-local PathfindingToggle = Pathfinding:Toggle("Pathfinding", "Automatically moves to enemies and kills them", shared.BladeQuest["Pathfinding"]["Pathfinding"], function(Value) 
+local PathfindingToggle = Pathfinding:Toggle("Pathfinding", "Automatically moves to enemies", shared.BladeQuest["Pathfinding"]["Pathfinding"], function(Value) 
     shared.BladeQuest["Pathfinding"]["Pathfinding"] = Value 
     
     if Value and not Lobby then 
@@ -241,3 +247,49 @@ local PathfindingToggle = Pathfinding:Toggle("Pathfinding", "Automatically moves
         end)
     end 
 end)
+
+local ShowPathToggle = Pathfinding:Toggle("Show Path", "Shows the pathfinding path", shared.BladeQuest["Pathfinding"]["ShowPath"], function(Value) 
+    shared.BladeQuest["Pathfinding"]["ShowPath"] = Value 
+    
+    if Value and not Lobby then 
+        CreateLoop("Pathfinding", "ShowPath", function()
+            
+        end)
+    end 
+end)
+
+-- AutoBuy
+
+local AutoBuyToggle = AutoBuy:Toggle("Auto-Buy", "Automatically buy/upgrade swords when in lobby", shared.BladeQuest["AutoBuy"]["AutoBuy"], function(Value) 
+    shared.BladeQuest["AutoBuy"]["AutoBuy"] = Value 
+    
+    if Value and not Lobby then 
+        CreateLoop("AutoBuy", "AutoBuy", function()
+            
+        end)
+    end 
+end)
+
+local UpgradeBestSword = AutoBuy:Toggle("Upgrade Best Sword", "Automatically upgrades your best sword when in lobby", shared.BladeQuest["AutoBuy"]["BuyBestSword"], function(Value)
+    shared.BladeQuest["AutoBuy"]["BuyBestSword"] = Value 
+    
+    if Value and not Lobby then 
+        CreateLoop("AutoBuy", "BuyBestSword", function()
+            
+        end)
+    end 
+end)
+
+AutoBuy:Line()
+local MaxBuyCost = AutoBuy:Textbox("Max Buy Cost", "Max buy cost for when buying/upgrading swords", false, function(Value) 
+    if not tonumber(Value) >= 0 then Value = 0 else Value = tonumber(Value) end
+    shared.BladeQuest["AutoBuy"]["MaxBuyCost"] = tonumber(Value) or 0
+    
+    if Value and not Lobby then 
+        CreateLoop("AutoBuy", "MaxBuyCost", function()
+            
+        end)
+    end 
+end)
+
+-- AutoSell
