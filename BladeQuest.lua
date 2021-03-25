@@ -33,6 +33,8 @@ if not ConvertedFunctions then Players.LocalPlayer:Kick("Incompatible exploit, a
 
 CheckGame()
 
+repeat wait() until game:GetService("Players").LocalPlayer.Character:FindFirstChild("Sword") and game:GetService("Players").LocalPlayer.Character.Sword:FindFirstChild("Sword") 
+
 -- // Settings
 
 function LoadSettings()local a=ConvertedFunctions;if a.readfile and a.isfile and a.writefile then local b=a.readfile;local c=a.writefile;local d=a.isfile;if d("BladeQuest.txt")==false then c("BladeQuest.txt",game:GetService("HttpService"):JSONEncode(shared.BladeQuest))else local e=game:GetService("HttpService"):JSONDecode(b("BladeQuest.txt"))for f,g in pairs(e)do for h,i in pairs(g)do shared.BladeQuest[f][h]=i end end end else warn("Failed to load settings!")return false end end 
