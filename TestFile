@@ -1,4 +1,4 @@
-local paste = "https://raw.githubusercontent.com/CMD-X/CMD-X/master/projetcs/InGameFlingForTB"
+local paste = "https://github.com/perhapsmaybe/Skript/blob/Code/TestFile"
 local message = _G.SpamMessage
 if not game:IsLoaded() then game.Loaded:wait() end
 
