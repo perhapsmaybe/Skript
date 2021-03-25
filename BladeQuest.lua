@@ -19,10 +19,17 @@ shared.BladeQuest = {["Player"] = {["MobTP"] = false, ["AutoAttack"] = false,["A
     },
     ["AutoSell"] = {
         ["AutoSell"] = false,
-        ["MinSellValue"] = 10,
         ["MaxSellValue"] = 10,
-        ["MinLevel"] = 1,
-        ["MaxLevel"] = 1
+        ["MaxLevel"] = 1,
+        ["MaxSellRarity"] = "Rare"
+    },
+    ["AutoMerge"] = {
+        ["AutoMerge"] = false,
+        ["MaxMergeRarity"] = "Rare"
+    },
+    ["Misc"] = {
+        ["ClaimQuests"] = false,
+        ["EquipBestSword"] = false
     }
 }
 
@@ -33,7 +40,8 @@ if not ConvertedFunctions then Players.LocalPlayer:Kick("Incompatible exploit, a
 
 CheckGame()
 
-repeat wait() until game:GetService("Players").LocalPlayer.Character:FindFirstChild("Sword") and game:GetService("Players").LocalPlayer.Character.Sword:FindFirstChild("Sword") 
+wait(2.5)
+repeat wait() until game:GetService("Players").LocalPlayer.Character ~= nil and game:GetService("Players").LocalPlayer.Character:FindFirstChild("Sword") and game:GetService("Players").LocalPlayer.Character.Sword:FindFirstChild("Sword") 
 
 -- // Settings
 
@@ -50,6 +58,8 @@ local Dungeon = UI:Tab("Dungeon", "http://www.roblox.com/asset/?id=6022668888")
 local Pathfinding = UI:Tab("Pathfinding", "http://www.roblox.com/asset/?id=6022668888")
 local AutoBuy = UI:Tab("Auto-Buy", "http://www.roblox.com/asset/?id=6022668888")
 local AutoSell = UI:Tab("Auto-Sell", "http://www.roblox.com/asset/?id=6022668888")
+local AutoMerge = UI:Tab("Auto-Merge", "http://www.roblox.com/asset/?id=6022668888")
+local MiscTab = UI:Tab("Misc", "http://www.roblox.com/asset/?id=6022668888")
 local InfoTab = UI:Tab("Credits", "http://www.roblox.com/asset/?id=6023426915")
 
 InfoTab:Label("V3rm Credits")
@@ -311,3 +321,93 @@ local MaxBuyCost = AutoBuy:Textbox("Max Buy Cost", "Max buy cost for when buying
 end)
 
 -- AutoSell
+
+-- AutoMerge
+
+local AutoMergeToggle = AutoMerge:Toggle("Auto-Merge", "Automatically merges swords", shared.BladeQuest["AutoMerge"]["AutoMerge"], function(Value)
+    shared.BladeQuest["AutoMerge"]["AutoMerge"] = Value
+    SaveSettings()
+
+    if Value and Lobby then
+        local SwordRarities = {}
+        local RarityValues = {
+            ["Common"] = 1,
+            ["Uncommon"] = 2,
+            ["Rare"] = 3,
+            ["Epic"] = 4,
+            ["Legendary"] = 5
+        }
+        local SwordFolder = game:GetService("ReplicatedStorage").Sword
+
+        CreateLoop("AutoMerge", "AutoMerge", function(Value)
+            wait(1)
+            SwordRarities = {}
+
+            for i, v in pairs(TempPlayer.Data.Swords:GetChildren()) do
+                if v:FindFirstChild("Tag") and SwordFolder:FindFirstChild(v.Tag.Value) and SwordFolder[v.Tag.Value]:FindFirstChild("Rarity") and tonumber(v.Name) ~= TempPlayer.Data.Stats.Sword.Value then 
+                    if RarityValues[SwordFolder[v.Tag.Value].Rarity.Value] <= RarityValues[shared.BladeQuest["AutoMerge"]["MaxMergeRarity"]] then
+                        if SwordRarities[SwordFolder[v.Tag.Value].Rarity.Value] == nil then SwordRarities[SwordFolder[v.Tag.Value].Rarity.Value] = {} end
+                        table.insert(SwordRarities[SwordFolder[v.Tag.Value].Rarity.Value], v)
+                    end
+                end 
+            end
+
+            for i, v in pairs(SwordRarities) do
+                if #v >= 5 then
+                    local TempMerge = {}
+                    for n = 1, 5 do
+                        table.insert(TempMerge, SwordRarities[i][n])
+                    end
+                    
+                    for n = 1, 4 do
+                        spawn(function()
+                           game:GetService("ReplicatedStorage").RF:InvokeServer("Merge", TempMerge, n, "Swords")
+                        end)
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+local MaxRarityDropdown = AutoMerge:Dropdown("Max Rarity", {"Common", "Uncommon", "Rare", "Epic", "Legendary"}, function(Value)
+    shared.BladeQuest["AutoMerge"]["MaxMergeRarity"] = Value
+    SaveSettings()
+end)
+
+-- Misc 
+
+local EquipBestSword = MiscTab:Toggle("Equip Best Sword", "Automatically equips your best sword", shared.BladeQuest["Misc"]["EquipBestSword"], function(Value)
+    shared.BladeQuest["Misc"]["EquipBestSword"] = Value
+    SaveSettings()
+
+    if Value and Lobby then 
+        local TopSword = nil
+        CreateLoop("Misc", "EquipBestSword", function(Value)
+            wait(2.5)
+            local CurrentSword = BestSword
+            for i, v in pairs(TempPlayer.Data.Swords:GetChildren()) do
+                if v:FindFirstChild("Amnt") then
+                    if TopSword == nil then
+                        TopSword = v
+                        CurrentSword = v
+                    elseif TopSword.Amnt.Value < v.Amnt.Value then
+                        CurrentSword = v 
+                    end
+                end
+            end 
+            
+            game:GetService("ReplicatedStorage").RE:FireServer("Equip", CurrentSword)
+        end)
+    end 
+end)
+
+local AutoClaimQuest = MiscTab:Toggle("Claim Quests", "Automatically claims quests for you when in lobby", shared.BladeQuest["Misc"]["ClaimQuest"], function(Value)
+    shared.BladeQuest["Misc"]["ClaimQuest"] = Value
+    
+    if Value and Lobby then 
+        for i = 1, 4 do
+            game:GetService("ReplicatedStorage").RE:FireServer("Claim", tostring(i))
+        end
+    end 
+end)
