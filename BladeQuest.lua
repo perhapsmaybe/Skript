@@ -231,7 +231,7 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
                             v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 3
                             v.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame + Vector3.new(0,-2,0)
                         else
-                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 5
+                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 6
                         end 
                     until not v:FindFirstChildWhichIsA("Humanoid") or v:FindFirstChildWhichIsA("Humanoid").Health == 0
                 end 
