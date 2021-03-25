@@ -49,4 +49,6 @@ for _,p in pairs(game:GetService("Players"):GetPlayers()) do
     end
 end
 
+wait(5)
+
 newserver()
