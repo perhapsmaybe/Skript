@@ -1,5 +1,5 @@
-local paste = "https://github.com/perhapsmaybe/Skript/blob/Code/TestFile"
-local message = _G.SpamMessage
+local paste = "https://raw.githubusercontent.com/CMD-X/CMD-X/master/projetcs/InGameFlingForTB"
+local message = "ayo, bro you good?"
 if not game:IsLoaded() then game.Loaded:wait() end
 
 local rand = Random.new()
@@ -37,13 +37,13 @@ local function newserver()
     end
 end
 
-for _ = 1,2 do
+for _ = 1,3 do
     event:FireServer(message, "All")
 end
 
 for _,p in pairs(game:GetService("Players"):GetPlayers()) do
     if p ~= plr then
-        for _ = 1,7 do
+        for _ = 1,2 do
             event:FireServer("/w "..p.Name.." "..message, "All")
         end
     end
