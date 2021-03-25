@@ -192,7 +192,7 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
         local BossName = "None"
         local BossTeleported = false
         CreateLoop("Player", "MobTP", function()
-            wait(1)
+            wait(0.5)
             if BossName == "None" then
                 for i, v in pairs(game:GetService("ReplicatedStorage").Enemies:GetChildren()) do
                     if v:FindFirstChild("Boss") and v:FindFirstChild("Boss").Value then
@@ -202,11 +202,7 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
             end 
             
             for i, v in pairs(workspace.Enemies:GetChildren()) do
-                if string.find(BossName, v.Name) then
-                    if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and v:FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
-                        v.HumanoidRootPart.Anchored = not v.HumanoidRootPart.Anchored
-                    end 
-                end 
+                v.HumanoidRootPart.Anchored = not v.HumanoidRootPart.Anchored
             end 
             
             if BossTeleported == false and BossName ~= "None" and workspace.Enemies:FindFirstChild(BossName) then
@@ -231,7 +227,7 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
                             v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 3
                             v.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame + Vector3.new(0,-2,0)
                         else
-                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 6
+                            v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 6.5
                         end 
                     until not v:FindFirstChildWhichIsA("Humanoid") or v:FindFirstChildWhichIsA("Humanoid").Health == 0
                 end 
