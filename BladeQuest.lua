@@ -191,8 +191,9 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
     if Value and not Lobby then
         local BossName = "None"
         local BossTeleported = false
+        local TimesTeleported2 = 0
         CreateLoop("Player", "MobTP", function()
-            wait(0.5)
+            wait(0.25)
             if BossName == "None" then
                 for i, v in pairs(game:GetService("ReplicatedStorage").Enemies:GetChildren()) do
                     if v:FindFirstChild("Boss") and v:FindFirstChild("Boss").Value then
@@ -204,7 +205,7 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
             for i, v in pairs(workspace.Enemies:GetChildren()) do
                 v.HumanoidRootPart.Anchored = not v.HumanoidRootPart.Anchored
             end 
-            
+
             if BossTeleported == false and BossName ~= "None" and workspace.Enemies:FindFirstChild(BossName) then
                 BossTeleported = true
                 local NewPart = Instance.new("Part")
@@ -221,13 +222,20 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
             setsimulationradius(1e3, 1e3)
             for i, v in pairs(workspace.Enemies:GetChildren()) do
                 if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildWhichIsA("Humanoid") and v:FindFirstChildWhichIsA("Humanoid").Health ~= 0 then
+                    local TimesTeleported = 0
                     repeat 
                         wait()
                         if game:GetService("ReplicatedStorage").Enemies:FindFirstChild(v.Name) and game:GetService("ReplicatedStorage").Enemies[v.Name]:FindFirstChild("Boss") and game:GetService("ReplicatedStorage").Enemies[v.Name].Boss.Value then
                             v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 3
                             v.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame + Vector3.new(0,-2,0)
                         else
+                            TimesTeleported = TimesTeleported + 1
+                            if TimesTeleported >= 50 then
+                                TimesTeleported = 0
+                                wait(1)
+                            end 
                             v.HumanoidRootPart.CFrame = TempPlayer.Character.HumanoidRootPart.CFrame + TempPlayer.Character.HumanoidRootPart.CFrame.lookVector * 6
+                            v.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame + Vector3.new(0,5,0)
                         end 
                     until not v:FindFirstChildWhichIsA("Humanoid") or v:FindFirstChildWhichIsA("Humanoid").Health == 0
                 end 
