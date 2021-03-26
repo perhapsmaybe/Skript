@@ -204,7 +204,7 @@ local MobTP = Player:Toggle("Mob Teleport", "Automatically teleports mobs to you
             
             for i, v in pairs(workspace.Enemies:GetChildren()) do
                 local enemyRootPart = v:WaitForChild("HumanoidRootPart")
-                enemyRootPart.HumanoidRootPart.Anchored = not enemyRootPart.HumanoidRootPart.Anchored
+                enemyRootPart.Anchored = not enemyRootPart.Anchored
             end 
 
             if BossTeleported == false and BossName ~= "None" and workspace.Enemies:FindFirstChild(BossName) then
